@@ -224,6 +224,16 @@ def run_agent(react_code: str, max_tries: int = 3, model_config: ModelConfig = N
         }
         attempts.append(attempt_record)
         
+        # Print attempt live
+        if errors:
+            print(f"  Attempt {try_no}/{max_tries}: ❌ {len(errors)} errors")
+            for err in errors[:3]:
+                msg = err.get("message", "unknown")[:60]
+                line = err.get("line", "?")
+                print(f"    Line {line}: {msg}")
+        else:
+            print(f"  Attempt {try_no}/{max_tries}: ✅ compiled successfully")
+        
         # Check if errors are outside component.rs (blocked)
         blocked_errors = [e for e in errors if "component.rs" not in e.get("file", "")]
         if blocked_errors:

@@ -573,7 +573,7 @@ def cmd_run(args):
         print(f"🚀 Processing: {item['source']}")
         print(f"{'='*60}")
         
-        # Run the full agent loop
+        # Run the full agent loop (prints each attempt live)
         from agent import run_agent
         result = run_agent(react_code, max_tries=max_tries, model_config=model_config)
         
@@ -592,16 +592,30 @@ def cmd_run(args):
         item["output"] = str(output_path.relative_to(output_dir))
         item["model"] = model_config.name
         
+        # Include errors from last attempt
+        if result["attempts"]:
+            last_attempt = result["attempts"][-1]
+            item["error_count"] = last_attempt.get("error_count", 0)
+            item["errors"] = last_attempt.get("errors", [])
+        
+        # Save manifest after EACH component (crash-safe)
+        with open(manifest_path, 'w') as f:
+            json.dump(manifest, f, indent=2)
+        
         # Print result
         verdict_emoji = "✅" if result["verdict"] == "passed" else "❌"
         print(f"{verdict_emoji} {item['source']} - {result['verdict']} (used {result['tries_used']}/{max_tries} tries)")
+        if result["verdict"] != "passed" and item.get("errors"):
+            print(f"   Last errors: {item['error_count']} errors")
+            for err in item["errors"][:2]:
+                print(f"     - {err.get('message', 'unknown')[:80]}")
         
         if result["verdict"] == "passed":
             passed_count += 1
         else:
             failed_count += 1
     
-    # Save updated manifest
+    # Final save
     with open(manifest_path, 'w') as f:
         json.dump(manifest, f, indent=2)
     
