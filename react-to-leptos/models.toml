@@ -1,0 +1,51 @@
+# Ollama server location
+[ollama]
+url = "http://localhost:11434"
+
+[models."mistral:latest"]
+model_id = "mistral:latest"
+temperature = 0.5
+num_ctx = 4096
+description = "Small and fast"
+
+[models."gemma4:12b"]
+model_id = "gemma4:12b"
+temperature = 0.6
+num_ctx = 8192
+description = "Gemma mid-size model"
+
+[models."gpt-oss-20b-32k"]
+model_id = "gpt-oss-20b-32k:latest"
+temperature = 0.6
+num_ctx = 32768
+description = "Open-weight reasoning model, 32k context"
+
+[models."qwen2.5-coder:7b"]
+model_id = "qwen2.5-coder:7b"
+temperature = 0.2
+num_ctx = 8192
+description = "Coding model"
+
+[models."qwen3.8:27b"]
+model_id = "qwen3.8:27b"
+temperature = 0.5
+num_ctx = 8192
+description = "Larger Qwen model, slower"
+
+[models."glm-4.7-flash:latest"]
+model_id = "glm-4.7-flash:latest"
+temperature = 0.7
+num_ctx = 131072
+description = "GLM 4.7 Flash - fast reasoning model"
+
+[models."deepseek-v2:16b"]
+model_id = "deepseek-v2:16b"
+temperature = 0.5
+num_ctx = 16384
+description = "DeepSeek v2 16B - coding and reasoning"
+
+[models."devstral-2"]
+model_id = "devstral-2"
+temperature = 0.7
+num_ctx = 32768
+description = "Devstral 2 - efficient reasoning model"
