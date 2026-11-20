@@ -7,6 +7,7 @@ A local Ollama prompt playground for testing and evaluating prompts with differe
 ```
 prompt-eval/
 ├── eval-template.ipynb    # Main Gradio UI notebook
+├── setup.py               # Setup module - creates default files if missing
 ├── evaluation.py          # Custom evaluation functions
 ├── models.toml            # Model configurations
 ├── prompts/               # Versioned prompt files
@@ -17,6 +18,16 @@ prompt-eval/
 ```
 
 ## Components
+
+### `setup.py`
+Setup module that initializes the directory structure with default files:
+
+```python
+from setup import setup_prompt_eval
+setup_prompt_eval()  # Creates models.toml, prompts/, evaluation.py if missing
+```
+
+Run standalone: `python setup.py`
 
 ### `eval-template.ipynb`
 - **Purpose**: Interactive Gradio UI for testing prompts with local Ollama models
@@ -57,6 +68,18 @@ def evaluation(text: str) -> str:
 - No kernel restart needed
 
 ## Setup
+
+### Initialize the project
+Run the setup module to create default files:
+```bash
+python setup.py
+```
+Or run the notebook cells - the first cell calls `setup_prompt_eval()` automatically.
+
+This creates:
+- `models.toml` with example model configurations
+- `prompts/` directory with sample prompts
+- `evaluation.py` with a stub function
 
 ### Prerequisites
 - Ollama running: `ollama serve`

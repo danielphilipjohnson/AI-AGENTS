@@ -2,10 +2,11 @@
 [ollama]
 url = "http://localhost:11434"
 
-# One [models."<name>"] block per model shown in the UI dropdown.
-# The key is the display name; model_id is what gets sent to Ollama.
-# Quote the key when the name contains dots or colons.
-# temperature / num_ctx feed the generation options automatically.
+[models."mistral:latest"]
+model_id = "mistral:latest"
+temperature = 0.5
+num_ctx = 4096
+description = "Small and fast"
 
 [models."gemma4:12b"]
 model_id = "gemma4:12b"
@@ -31,8 +32,8 @@ temperature = 0.5
 num_ctx = 8192
 description = "Larger Qwen model, slower"
 
-[models."glm-4.7-flash"]
-model_id = "glm-4.7-flash"
+[models."glm-4.7-flash:latest"]
+model_id = "glm-4.7-flash:latest"
 temperature = 0.7
 num_ctx = 131072
 description = "GLM 4.7 Flash - fast reasoning model"
