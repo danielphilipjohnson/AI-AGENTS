@@ -50,6 +50,12 @@ model_id = "deepseek-v2:16b"
 temperature = 0.5
 num_ctx = 16384
 description = "DeepSeek v2 16B - coding and reasoning"
+
+[models."devstral-2"]
+model_id = "devstral-2"
+temperature = 0.7
+num_ctx = 32768
+description = "Devstral 2 - efficient reasoning model"
 '''
 
 DEFAULT_EVALUATION = '''def evaluation(text: str) -> str:
