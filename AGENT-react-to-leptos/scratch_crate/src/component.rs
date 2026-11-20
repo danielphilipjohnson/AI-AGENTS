@@ -7,19 +7,29 @@ pub enum Breakpoint {
     Lg,
 }
 
-pub struct GridProps {
-    pub cols: Option<u32>,
-    pub row_gap: Option<u32>,
-    pub col_gap: Option<u32>,
-    pub breakpoint: Option<Breakpoint>,
-    pub class: String,
-    pub children: Option<Children>,
+#[derive(Props)]
+pub struct GridColProps {
+    #[prop(optional)]
+    cols: Option<u32>,
+    #[prop(optional)]
+    class: Option<String>,
+    children: Children,
 }
 
-pub struct GridColProps {
-    pub cols: Option<u32>,
-    pub class: String,
-    pub children: Children,
+#[derive(Props)]
+pub struct GridProps {
+    #[prop(optional)]
+    cols: Option<u32>,
+    #[prop(optional)]
+    row_gap: Option<u32>,
+    #[prop(optional)]
+    col_gap: Option<u32>,
+    #[prop(optional)]
+    breakpoint: Option<Breakpoint>,
+    #[prop(optional)]
+    class: Option<String>,
+    #[prop(optional)]
+    children: Option<Children>,
 }
 
 fn responsive_cols(bp: Breakpoint, cols: u32) -> String {
@@ -62,25 +72,23 @@ pub fn Grid(props: GridProps) -> impl IntoView {
             Some(col_gap) => format!("gap-x-{}", col_gap),
             None => "gap-x-6".to_string(),
         },
-        props.class.clone(),
+        props.class.clone().unwrap_or_default(),
     );
 
     view! {
         <div class=classes>
-            {props.children.map(|c| c()).unwrap_or_default()}
+            {props.children.map(|c| c())}
         </div>
     }
 }
 
 #[component]
 pub fn GridCol(props: GridColProps) -> impl IntoView {
-    let classes = tw_merge!(
-        match props.cols {
-            Some(cols) => col_span_class(cols),
-            None => "",
-        },
-        props.class.clone(),
-    );
+    let base_class = match props.cols {
+        Some(cols) => col_span_class(cols).to_string(),
+        None => props.class.clone().unwrap_or_default(),
+    };
+    let classes = tw_merge!(base_class, props.class.clone().unwrap_or_default());
 
     view! {
         <div class=classes>

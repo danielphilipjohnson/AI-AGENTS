@@ -1,4 +1,4 @@
-use leptos::prelude::*;
+use leptos::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum ContainerMaxWidth {
