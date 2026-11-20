@@ -153,7 +153,7 @@ def cmd_batch(args):
     print(f"Max tries: {args.max_tries}")
     print(f"File limit: {args.limit}")
     
-    # Run batch
+    # Run batch (full agent loop on each file)
     summary = run_batch(
         target=target,
         output=output,
@@ -162,7 +162,8 @@ def cmd_batch(args):
         model_config=model_config,
     )
     
-    print(f"\nBatch complete:")
+    print(f"\n{'='*60}")
+    print(f"Batch complete:")
     print(f"  Files processed: {summary.get('files_processed', 0)}")
     print(f"  Passed: {summary.get('passed', 0)}")
     print(f"  Failed: {summary.get('failed', 0)}")
@@ -518,6 +519,99 @@ def cmd_fix_compile(args):
     return 0
 
 
+def cmd_run(args):
+    """
+    Run the full agent loop (convert → check → fix up to max_tries) for each component in manifest.
+    
+    Usage:
+        python cli.py run manifest.json --output ./leptos-output --max-tries 3
+    """
+    import json
+    
+    manifest_path = Path(args.manifest)
+    output_dir = Path(args.output)
+    max_tries = args.max_tries or 3
+    
+    if not manifest_path.exists():
+        print(f"Error: Manifest file '{manifest_path}' not found")
+        sys.exit(1)
+    
+    output_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Load manifest
+    with open(manifest_path) as f:
+        manifest = json.load(f)
+    
+    # Load model config
+    if args.model:
+        model_config = ModelConfig(name=args.model, temperature=args.temperature)
+    else:
+        model_config = load_model_config()
+    
+    print(f"Running full agent loop on {len(manifest)} components")
+    print(f"Model: {model_config.name} (from {'CLI' if args.model else 'TOML'})")
+    print(f"Max tries per component: {max_tries}")
+    print(f"Output: {output_dir}\n")
+    
+    passed_count = 0
+    failed_count = 0
+    
+    for item in manifest:
+        source_path = Path(item["absolute"])
+        
+        if not source_path.exists():
+            print(f"❌ {item['source']} - FILE NOT FOUND")
+            item["status"] = "failed"
+            item["error"] = "file_not_found"
+            failed_count += 1
+            continue
+        
+        # Read the React code
+        react_code = read(source_path)
+        
+        print(f"\n{'='*60}")
+        print(f"🚀 Processing: {item['source']}")
+        print(f"{'='*60}")
+        
+        # Run the full agent loop
+        from agent import run_agent
+        result = run_agent(react_code, max_tries=max_tries, model_config=model_config)
+        
+        # Map to output path
+        output_path = map_output_path(output_dir, source_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Write the final code
+        output_path.write_text(result["final_code"])
+        
+        # Update manifest with full results
+        item["status"] = result["verdict"]  # passed, failed, stalled, blocked
+        item["verdict"] = result["verdict"]
+        item["tries_used"] = result["tries_used"]
+        item["attempts"] = result["attempts"]
+        item["output"] = str(output_path.relative_to(output_dir))
+        item["model"] = model_config.name
+        
+        # Print result
+        verdict_emoji = "✅" if result["verdict"] == "passed" else "❌"
+        print(f"{verdict_emoji} {item['source']} - {result['verdict']} (used {result['tries_used']}/{max_tries} tries)")
+        
+        if result["verdict"] == "passed":
+            passed_count += 1
+        else:
+            failed_count += 1
+    
+    # Save updated manifest
+    with open(manifest_path, 'w') as f:
+        json.dump(manifest, f, indent=2)
+    
+    print(f"\n{'='*60}")
+    print(f"Done! {passed_count} passed, {failed_count} failed")
+    print(f"Manifest updated: {manifest_path}")
+    
+    return 0
+
+
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
@@ -542,6 +636,9 @@ Examples:
 
   # Fix compilation errors with LLM
   python cli.py fix-compile manifest.json --max-tries 3
+
+  # Run full loop (convert → check → fix → verify)
+  python cli.py run manifest.json --output ./leptos-output --max-tries 3
         """
     )
     
@@ -589,6 +686,16 @@ Examples:
     fix_compile_parser.add_argument('--model', help='Ollama model to use (overrides TOML)')
     fix_compile_parser.add_argument('--temperature', type=float, help='Temperature (overrides TOML)')
     
+    # RUN command (full loop)
+    run_parser = subparsers.add_parser('run', 
+                                        help='Run full agent loop (convert→check→fix) on manifest')
+    run_parser.add_argument('manifest', help='Path to manifest.json file')
+    run_parser.add_argument('--output', '-o', required=True, help='Output directory for Rust files')
+    run_parser.add_argument('--max-tries', '-n', type=int, default=3, 
+                           help='Max tries per component (default: 3)')
+    run_parser.add_argument('--model', help='Ollama model to use (overrides TOML)')
+    run_parser.add_argument('--temperature', type=float, help='Temperature (overrides TOML)')
+    
     # CONVERT-MANIFEST command
     convert_manifest_parser = subparsers.add_parser('convert-manifest', 
                                                       help='Convert all components from manifest using Ollama')
@@ -611,6 +718,7 @@ Examples:
         return cmd_scan(args)
     elif args.command == 'convert':
         return cmd_convert(args)
+    ## NEED test
     elif args.command == 'batch':
         return cmd_batch(args)
     elif args.command == 'convert-manifest':
@@ -619,6 +727,8 @@ Examples:
         return cmd_check_compile(args)
     elif args.command == 'fix-compile':
         return cmd_fix_compile(args)
+    elif args.command == 'run':
+        return cmd_run(args)
     else:
         parser.print_help()
         sys.exit(1)

@@ -2,8 +2,8 @@ use leptos::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum ContainerMaxWidth {
-    Narrow,
     #[default]
+    Narrow,
     Default,
     Wide,
     Full,
@@ -13,20 +13,20 @@ pub enum ContainerMaxWidth {
 impl ContainerMaxWidth {
     pub fn class(&self) -> &'static str {
         match self {
-            Self::Narrow => "max-w-narrow",
-            Self::Default => "max-w-page",
-            Self::Wide => "max-w-xl",
-            Self::Full => "max-w-none",
-            Self::Page => "max-w-page",
+            ContainerMaxWidth::Narrow => "max-w-narrow",
+            ContainerMaxWidth::Default => "max-w-page",
+            ContainerMaxWidth::Wide => "max-w-xl",
+            ContainerMaxWidth::Full => "max-w-none",
+            ContainerMaxWidth::Page => "max-w-page",
         }
     }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum ContainerHorizontalPadding {
+    #[default]
     None,
     Sm,
-    #[default]
     Default,
     Lg,
 }
@@ -34,19 +34,20 @@ pub enum ContainerHorizontalPadding {
 impl ContainerHorizontalPadding {
     pub fn class(&self) -> &'static str {
         match self {
-            Self::None => "px-0",
-            Self::Sm => "px-4 md:px-6",
-            Self::Default => "px-4 md:px-8",
-            Self::Lg => "px-6 md:px-12",
+            ContainerHorizontalPadding::None => "px-0",
+            ContainerHorizontalPadding::Sm => "px-4 md:px-6",
+            ContainerHorizontalPadding::Default => "px-4 md:px-8",
+            ContainerHorizontalPadding::Lg => "px-6 md:px-12",
         }
     }
 }
 
 #[component]
 pub fn Container(
+    cx: Scope,
     #[prop(default = ContainerMaxWidth::Default)] max_width: ContainerMaxWidth,
     #[prop(default = ContainerHorizontalPadding::Default)] horizontal_padding: ContainerHorizontalPadding,
-    #[prop(optional, into)] class: String,
+    #[prop(optional, into)] class_name: String,
     #[prop(optional)] id: Option<String>,
     #[prop(optional)] style: Option<String>,
     #[prop(optional)] aria_label: Option<String>,
@@ -56,11 +57,15 @@ pub fn Container(
         "w-full mx-auto {} {} {}",
         max_width.class(),
         horizontal_padding.class(),
-        class
+        class_name
     );
-
-    view! {
-        <div class=classes id=id style=style aria-label=aria_label>
+    view! { cx,
+        <div
+            class=classes
+            id=id
+            style=style
+            aria-label=aria_label
+        >
             {children.map(|c| c())}
         </div>
     }

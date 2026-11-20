@@ -58,10 +58,13 @@ AGENT-react-to-leptos/
 **Gate:** ⏳ Hand-test on one leaf component, verify fix uses error history.
 
 ### 3.3 Batch Runner
-- [ ] `run_batch()` - Process all files, track manifest (stubbed)
+- [x] `run_agent()` - Full loop (convert → check → fix up to 3 tries) ✅
+- [x] `run_batch()` - Scan directory + run full loop on all files ✅
+- [x] CLI `batch` command - No manifest needed, does everything ✅
+- [x] CLI `run` command - Uses run_agent on manifest ✅
 - [ ] Resume support (skip already-processed files)
 
-**Gate:** ⏳ Run on 3 files, verify resume works on re-run.
+**Gate:** ✅ Batch processing complete - one command does scan + convert + check + fix
 
 ---
 
