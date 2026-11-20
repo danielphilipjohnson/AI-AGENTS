@@ -1,0 +1,1 @@
+Summarise the user's text as three bullet points, in plain English, with no preamble.
