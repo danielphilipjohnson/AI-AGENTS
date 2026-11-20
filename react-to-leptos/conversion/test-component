@@ -1,0 +1,74 @@
+// @agency/ui/layout/Grid.tsx
+import * as React from 'react';
+import { cn } from '@flyfox/ui/lib/cn';
+
+export type Breakpoint = 'sm' | 'md' | 'lg';
+
+export interface GridProps {
+  /** number of columns (mobile defaults to 1) */
+  cols?: number;
+  /** row gap (Tailwind spacing scale, e.g. 4 = gap-y-4) */
+  rowGap?: number;
+  /** column gap (Tailwind spacing scale, e.g. 6 = gap-x-6) */
+  colGap?: number;
+  /** responsive breakpoint for cols (default `md`) */
+  breakpoint?: Breakpoint;
+  /** extra classes (span, responsive overrides, etc.) */
+  className?: string;
+  children?: React.ReactNode;
+}
+
+function responsiveCols(bp: Breakpoint, cols: number): string {
+  return `${bp}:grid-cols-${cols}`;
+}
+
+const COL_SPAN_CLASS_MAP: Record<number, string> = {
+  1: 'col-span-1',
+  2: 'col-span-2',
+  3: 'col-span-3',
+  4: 'col-span-4',
+  5: 'col-span-5',
+  6: 'col-span-6',
+  7: 'col-span-7',
+  8: 'col-span-8',
+  9: 'col-span-9',
+  10: 'col-span-10',
+  11: 'col-span-11',
+  12: 'col-span-12',
+};
+
+export function Grid({
+  cols = 2,
+  rowGap = 6,
+  colGap = 6,
+  breakpoint = 'md',
+  className,
+  children,
+}: GridProps) {
+  return (
+    <div
+      className={cn(
+        'grid',
+        'grid-cols-1',
+        responsiveCols(breakpoint, cols),
+        `gap-y-${rowGap}`,
+        `gap-x-${colGap}`,
+        className
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+export type GridColProps = {
+  span?: number;
+  className?: string;
+  children?: React.ReactNode;
+};
+
+export function GridCol({ span = 1, className, children }: GridColProps) {
+  const spanClass = COL_SPAN_CLASS_MAP[span] ?? COL_SPAN_CLASS_MAP[1];
+
+  return <div className={cn(spanClass, className)}> {children} </div>;
+}
