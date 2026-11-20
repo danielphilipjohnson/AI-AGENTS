@@ -1,0 +1,10 @@
+[
+  {
+    "source": "Section/Section.tsx",
+    "absolute": "/home/daniel/Documents/agency/mainsite/packages/ui/src/layout/Section/Section.tsx",
+    "status": "passed",
+    "output": "packages/ui/src/layout/Section/section.rs",
+    "verdict": "passed",
+    "model": "gpt-oss-20b-32k:latest"
+  }
+]

@@ -1,0 +1,15 @@
+[package]
+name = "scratch_crate"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "scratch_crate"
+path = "src/lib.rs"
+
+[dependencies]
+leptos = { version = "0.6", features = ["csr"] }
+leptos_reactive = "0.6"
+
+[profile.release]
+opt-level = "z"

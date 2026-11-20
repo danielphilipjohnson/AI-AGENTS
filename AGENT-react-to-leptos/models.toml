@@ -1,0 +1,21 @@
+# Ollama Configuration for React -> Leptos Conversion Agent
+
+[ollama]
+url = "http://localhost:11434"
+
+[ollama.models]
+# Model for TSX -> Leptos conversion
+convert = "gpt-oss-20b-32k:latest"
+
+# Model for fixing Rust compilation errors
+fix = "gpt-oss-20b-32k:latest"
+
+[ollama.settings]
+# Default settings for all models
+temperature = 0.1
+num_ctx = 8192
+num_predict = 16384
+
+[ollama.timeouts]
+request_timeout = 600
+keep_alive = 300
